@@ -21,6 +21,7 @@
 namespace
 {
 using metasequoia::FrequencyAdjustmentMode;
+using metasequoia::linux_ime::CandidateWindowLayout;
 using metasequoia::linux_ime::CharacterWidth;
 using metasequoia::linux_ime::InputMode;
 using metasequoia::linux_ime::InputSettings;
@@ -126,9 +127,7 @@ std::string read_file(const std::filesystem::path &path)
 
 ino_t inode(const std::filesystem::path &path)
 {
-    struct stat info
-    {
-    };
+    struct stat info{};
     if (stat(metasequoia::path_to_utf8(path).c_str(), &info) != 0)
     {
         throw std::runtime_error("Failed to inspect the settings file.");
@@ -155,6 +154,7 @@ int main()
     const InputSettings defaults = store.load(&warning);
     require(defaults.mode == InputMode::Ime && defaults.default_mode == InputMode::Ime &&
                 defaults.scheme == SchemeType::Quanpin && defaults.page_size == 9 &&
+                defaults.candidate_window_layout == CandidateWindowLayout::Vertical &&
                 defaults.punctuation_mode == PunctuationMode::Chinese &&
                 defaults.punctuation_lock == PunctuationLock::Follow &&
                 defaults.character_width == CharacterWidth::Half && defaults.comma_period_paging &&
@@ -190,6 +190,7 @@ int main()
     saved.default_mode = InputMode::Direct;
     saved.scheme = SchemeType::Wubi;
     saved.page_size = 3;
+    saved.candidate_window_layout = CandidateWindowLayout::Horizontal;
     saved.punctuation_mode = PunctuationMode::English;
     saved.punctuation_lock = PunctuationLock::English;
     saved.character_width = CharacterWidth::Full;
@@ -256,6 +257,7 @@ int main()
     const InputSettings round_trip = store.load(&warning);
     require(round_trip.mode == saved.mode && round_trip.default_mode == saved.default_mode &&
                 round_trip.scheme == saved.scheme && round_trip.page_size == saved.page_size &&
+                round_trip.candidate_window_layout == saved.candidate_window_layout &&
                 round_trip.punctuation_mode == saved.punctuation_mode &&
                 round_trip.punctuation_lock == saved.punctuation_lock &&
                 round_trip.character_width == saved.character_width &&
@@ -326,6 +328,7 @@ int main()
                             "mode=ime\n"
                             "scheme=shuangpin\n"
                             "page-size=5\n"
+                            "candidate-window-layout=horizontal\n"
                             "punctuation=english\n"
                             "full-width=true\n"
                             "comma-period-paging=true\n"
@@ -381,6 +384,7 @@ int main()
     updated.mode = InputMode::Direct;
     updated.scheme = SchemeType::JapaneseRomaji;
     updated.page_size = 7;
+    updated.candidate_window_layout = CandidateWindowLayout::Vertical;
     updated.punctuation_mode = PunctuationMode::Chinese;
     updated.character_width = CharacterWidth::Half;
     updated.comma_period_paging = false;
@@ -444,6 +448,7 @@ int main()
                             "mode=unexpected\n"
                             "scheme=unsupported\n"
                             "page-size=12\n"
+                            "candidate-window-layout=unexpected\n"
                             "punctuation=unsupported\n"
                             "full-width=unexpected\n"
                             "comma-period-paging=unexpected\n"
@@ -489,6 +494,7 @@ int main()
                             "endpoint=http://insecure.example.test/translate\n");
     const InputSettings invalid = store.load(&warning);
     require(invalid.mode == InputMode::Ime && invalid.scheme == SchemeType::Quanpin && invalid.page_size == 9 &&
+                invalid.candidate_window_layout == CandidateWindowLayout::Vertical &&
                 invalid.punctuation_mode == PunctuationMode::Chinese &&
                 invalid.character_width == CharacterWidth::Half && invalid.comma_period_paging &&
                 invalid.word_to_character && !invalid.bracket_paging && invalid.smart_punctuation &&
@@ -520,6 +526,10 @@ int main()
     unsupported.frequency_adjustment_mode = static_cast<FrequencyAdjustmentMode>(99);
     require(!store.save(unsupported, &error) && !error.empty(),
             "An unsupported frequency adjustment mode was written to disk.");
+    unsupported = saved;
+    unsupported.candidate_window_layout = static_cast<CandidateWindowLayout>(99);
+    require(!store.save(unsupported, &error) && !error.empty(),
+            "An unsupported candidate window layout was written to disk.");
     unsupported = saved;
     unsupported.frequency_trigger_count = 11;
     require(!store.save(unsupported, &error) && !error.empty(),

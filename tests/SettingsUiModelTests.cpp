@@ -50,6 +50,7 @@ int main()
                     find_row("voice-credential").value.empty(),
                 "A credential row misreported whether a credential is held.");
         require(settings_section_for_id("page-size") == SettingsUiSection::Appearance &&
+                    settings_section_for_id("candidate-window-layout") == SettingsUiSection::Appearance &&
                     settings_section_for_id("scheme") == SettingsUiSection::Input &&
                     settings_section_for_id("quanpin-helpcode") == SettingsUiSection::Helpcode &&
                     settings_section_for_id("temporary-english-mode") == SettingsUiSection::Shortcuts &&
@@ -67,6 +68,12 @@ int main()
         require(model.settings().scheme == SchemeType::Shuangpin, "The scheme choice was not applied.");
         require(model.set("page-size", "7", &error), "A valid integer could not be applied.");
         require(model.settings().page_size == 7, "The page size was not applied.");
+        require(model.set("candidate-window-layout", "horizontal", &error),
+                "A valid candidate window layout could not be applied.");
+        require(model.settings().candidate_window_layout == CandidateWindowLayout::Horizontal,
+                "The candidate window layout was not applied.");
+        require(!model.set("candidate-window-layout", "diagonal", &error) && !error.empty(),
+                "An unsupported candidate window layout was accepted.");
         require(model.set("cloud-enabled", "false", &error), "A valid online toggle could not be applied.");
         require(!model.settings().online.cloud_candidates_enabled, "The online toggle was not applied.");
         require(model.set("floating-toolbar", "false", &error), "A valid toolbar toggle could not be applied.");

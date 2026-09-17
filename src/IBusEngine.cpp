@@ -34,6 +34,7 @@
 
 namespace
 {
+using metasequoia::linux_ime::CandidateWindowLayout;
 using metasequoia::linux_ime::CharacterWidth;
 using metasequoia::linux_ime::ControllerResult;
 using metasequoia::linux_ime::FrontendKey;
@@ -90,6 +91,9 @@ struct _MetasequoiaEngine
     InputMode default_mode = InputMode::Ime;
     bool show_quanpin_helpcode = true;
     bool show_shuangpin_helpcode = true;
+    // Presentation-only, like the helpcode hints above: the panel reads it from every table this
+    // engine publishes, so a settings reload just republishes the current table with it applied.
+    CandidateWindowLayout candidate_window_layout = CandidateWindowLayout::Vertical;
     SettingsStore *settings_store = nullptr;
     // The settings as they were read from disk. Persisting starts from this copy so the keys the
     // engine does not own -- the utility toggles, the keybindings, the voice provider, everything
@@ -531,6 +535,11 @@ void update_preedit(MetasequoiaEngine *engine)
 void update_lookup_table(MetasequoiaEngine *engine)
 {
     IBusLookupTable *table = ibus_lookup_table_new(static_cast<guint>(engine->controller->page_size()), 0, TRUE, FALSE);
+    // Vertical is what IBus draws by default; setting it explicitly is what makes the configured
+    // orientation survive a reload, because this table is rebuilt on every keystroke.
+    ibus_lookup_table_set_orientation(table, engine->candidate_window_layout == CandidateWindowLayout::Horizontal
+                                                 ? IBUS_ORIENTATION_HORIZONTAL
+                                                 : IBUS_ORIENTATION_VERTICAL);
     for (const WordItem &candidate : engine->controller->candidates())
     {
         std::string display = candidate.word;
@@ -1074,6 +1083,7 @@ void adopt_engine_settings(MetasequoiaEngine *engine, const InputSettings &setti
     engine->default_mode = settings.default_mode;
     engine->show_quanpin_helpcode = settings.show_quanpin_helpcode_in_candidates;
     engine->show_shuangpin_helpcode = settings.show_shuangpin_helpcode_in_candidates;
+    engine->candidate_window_layout = settings.candidate_window_layout;
     engine->mode_toggle->configure(
         {settings.switch_language_shift, settings.switch_language_ctrl, settings.switch_language_ctrl_alt_space});
 }

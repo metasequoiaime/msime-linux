@@ -35,9 +35,7 @@ class ConfigWriteLock
         descriptor_ = open(lock_path.c_str(), O_RDWR | O_CREAT | O_CLOEXEC | O_NOFOLLOW, 0600);
         if (descriptor_ < 0)
             return;
-        struct stat status
-        {
-        };
+        struct stat status{};
         if (fstat(descriptor_, &status) != 0 || !S_ISREG(status.st_mode) || status.st_uid != geteuid())
             return;
         int result;
@@ -274,6 +272,18 @@ const char *preedit_style_name(PreeditStyle style)
     return nullptr;
 }
 
+const char *candidate_window_layout_name(CandidateWindowLayout layout)
+{
+    switch (layout)
+    {
+    case CandidateWindowLayout::Vertical:
+        return "vertical";
+    case CandidateWindowLayout::Horizontal:
+        return "horizontal";
+    }
+    return nullptr;
+}
+
 const char *frequency_adjustment_name(FrequencyAdjustmentMode mode)
 {
     switch (mode)
@@ -303,6 +313,7 @@ bool valid_input_settings(const InputSettings &settings)
            scheme_name(settings.scheme) != nullptr && punctuation_name(settings.punctuation_mode) != nullptr &&
            punctuation_lock_name(settings.punctuation_lock) != nullptr &&
            preedit_style_name(settings.preedit_style) != nullptr &&
+           candidate_window_layout_name(settings.candidate_window_layout) != nullptr &&
            frequency_adjustment_name(settings.frequency_adjustment_mode) != nullptr &&
            valid_character_width(settings.character_width) && settings.page_size >= kMinimumPageSize &&
            settings.page_size <= kMaximumPageSize &&
@@ -658,6 +669,21 @@ InputSettings SettingsStore::load(std::string *warning) const
             settings.preedit_style = PreeditStyle::Hidden;
         }
         else if (name != "raw")
+        {
+            invalid = true;
+        }
+        g_free(value);
+    }
+
+    if (g_key_file_has_key(key_file, kGroup, "candidate-window-layout", nullptr))
+    {
+        gchar *value = g_key_file_get_string(key_file, kGroup, "candidate-window-layout", nullptr);
+        const std::string_view name = value == nullptr ? std::string_view{} : std::string_view(value);
+        if (name == "horizontal")
+        {
+            settings.candidate_window_layout = CandidateWindowLayout::Horizontal;
+        }
+        else if (name != "vertical")
         {
             invalid = true;
         }
@@ -1152,6 +1178,7 @@ bool SettingsStore::save_unlocked(const InputSettings &settings, std::string *er
     const char *punctuation = punctuation_name(settings.punctuation_mode);
     const char *punctuation_lock = punctuation_lock_name(settings.punctuation_lock);
     const char *preedit_style = preedit_style_name(settings.preedit_style);
+    const char *candidate_window_layout = candidate_window_layout_name(settings.candidate_window_layout);
     const char *frequency_adjustment = frequency_adjustment_name(settings.frequency_adjustment_mode);
     if (!valid_input_settings(settings))
     {
@@ -1206,6 +1233,7 @@ bool SettingsStore::save_unlocked(const InputSettings &settings, std::string *er
     g_key_file_set_string(key_file, kGroup, "default-mode", default_mode);
     g_key_file_set_string(key_file, kGroup, "scheme", scheme);
     g_key_file_set_integer(key_file, kGroup, "page-size", static_cast<gint>(settings.page_size));
+    g_key_file_set_string(key_file, kGroup, "candidate-window-layout", candidate_window_layout);
     g_key_file_set_string(key_file, kGroup, "punctuation", punctuation);
     g_key_file_set_string(key_file, kGroup, "punctuation-lock", punctuation_lock);
     g_key_file_set_boolean(key_file, kGroup, "full-width", settings.character_width == CharacterWidth::Full);

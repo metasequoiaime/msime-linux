@@ -140,6 +140,11 @@ std::string preedit_value(PreeditStyle value)
     return "raw";
 }
 
+std::string candidate_window_layout_value(CandidateWindowLayout value)
+{
+    return value == CandidateWindowLayout::Horizontal ? "horizontal" : "vertical";
+}
+
 std::string frequency_value(FrequencyAdjustmentMode value)
 {
     switch (value)
@@ -224,9 +229,10 @@ std::string settings_credential_clear_id(const std::string &credential_id)
 
 SettingsUiSection settings_section_for_id(const std::string &id)
 {
-    if (id == "page-size" || id == "punctuation" || id == "punctuation-lock" || id == "width" ||
-        id == "preedit-style" || id == "smart-punctuation" || id == "smart-punctuation-repeat-to-chinese" ||
-        id == "paired-punctuation" || id == "bracket-paging" || id == "word-to-character")
+    if (id == "page-size" || id == "candidate-window-layout" || id == "punctuation" || id == "punctuation-lock" ||
+        id == "width" || id == "preedit-style" || id == "smart-punctuation" ||
+        id == "smart-punctuation-repeat-to-chinese" || id == "paired-punctuation" || id == "bracket-paging" ||
+        id == "word-to-character")
     {
         return SettingsUiSection::Appearance;
     }
@@ -310,6 +316,9 @@ void SettingsUiModel::rebuild_rows()
     add(rows_, "scheme", "Input scheme", scheme_value(settings_.scheme), SettingsControl::Choice,
         {"quanpin", "shuangpin", "wubi", "japanese"});
     add(rows_, "page-size", "Candidates per page", std::to_string(settings_.page_size), SettingsControl::Integer);
+    add(rows_, "candidate-window-layout", "Candidate window layout",
+        candidate_window_layout_value(settings_.candidate_window_layout), SettingsControl::Choice,
+        {"vertical", "horizontal"});
     add(rows_, "punctuation", "Punctuation", punctuation_value(settings_.punctuation_mode), SettingsControl::Choice,
         {"chinese", "english"});
     add(rows_, "punctuation-lock", "Punctuation lock", punctuation_lock_value(settings_.punctuation_lock),
@@ -510,6 +519,15 @@ bool SettingsUiModel::set(const std::string &id, const std::string &value, std::
             candidate.preedit_style = PreeditStyle::Pinyin;
         else if (value == "hidden")
             candidate.preedit_style = PreeditStyle::Hidden;
+        else
+            parsed = false;
+    }
+    else if (id == "candidate-window-layout")
+    {
+        if (value == "vertical")
+            candidate.candidate_window_layout = CandidateWindowLayout::Vertical;
+        else if (value == "horizontal")
+            candidate.candidate_window_layout = CandidateWindowLayout::Horizontal;
         else
             parsed = false;
     }

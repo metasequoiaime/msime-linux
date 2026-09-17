@@ -16,6 +16,7 @@ struct Binding
 // consent, or transient input mode is eligible for automatic serialization.
 constexpr Binding bindings[] = {
     {"page-size", "appearance.page_size"},
+    {"candidate-window-layout", "appearance.candidate_window_layout"},
     {"comma-period-paging", "general.paging_comma_period"},
     {"bracket-paging", "general.paging_brackets"},
     {"word-to-character", "input.word_to_character"},

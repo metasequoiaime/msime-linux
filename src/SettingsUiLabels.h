@@ -18,6 +18,7 @@ inline const char *row_label(const SettingsUiRow &row)
         {"emoji-mode", "Emoji 模式"},
         {"kaomoji-mode", "颜文字模式"},
         {"page-size", "每页候选数"},
+        {"candidate-window-layout", "候选窗口排列方式"},
         {"punctuation", "标点模式"},
         {"width", "字符宽度"},
         {"preedit-style", "预编辑样式"},

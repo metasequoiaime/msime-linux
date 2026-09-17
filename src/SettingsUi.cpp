@@ -153,6 +153,10 @@ const char *choice_label(const std::string &value)
         return "分词拼音";
     if (value == "hidden")
         return "隐藏";
+    if (value == "vertical")
+        return "竖排";
+    if (value == "horizontal")
+        return "横排";
     if (value == "lantian")
         return "蓝天";
     if (value == "ziranma")

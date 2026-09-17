@@ -19,6 +19,12 @@ enum class TranslationProvider
     DeepLX,
 };
 
+enum class CandidateWindowLayout
+{
+    Vertical,
+    Horizontal,
+};
+
 struct OnlineSettings
 {
     bool cloud_candidates_enabled = true;
@@ -59,6 +65,9 @@ struct InputSettings
     InputMode default_mode = InputMode::Ime;
     SchemeType scheme = SchemeType::Quanpin;
     std::size_t page_size = 9;
+    // The candidate window orientation, matching the Windows appearance.candidate_window_layout.
+    // Vertical is what IBus draws by default, so it is the default here too.
+    CandidateWindowLayout candidate_window_layout = CandidateWindowLayout::Vertical;
     PunctuationMode punctuation_mode = PunctuationMode::Chinese;
     PunctuationLock punctuation_lock = PunctuationLock::Follow;
     CharacterWidth character_width = CharacterWidth::Half;

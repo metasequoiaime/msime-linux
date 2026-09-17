@@ -27,14 +27,17 @@ int main()
 {
     InputSettings local;
     local.page_size = 5;
+    local.candidate_window_layout = CandidateWindowLayout::Horizontal;
     local.online.cloud_candidates_enabled = true;
     local.online.ai.token = "synthetic-private-credential";
     local.online.ai.endpoint = "https://private.invalid/never-export";
     local.voice.token = "synthetic-private-voice";
     local.clipboard_history_enabled = true;
     const auto exported = account::CloudSettingsMapper::export_settings(local);
-    require(exported.size() == 42, "unexpected binding coverage");
+    require(exported.size() == 43, "unexpected binding coverage");
     require(std::get<std::int64_t>(exported.at("appearance.page_size")) == 5, "page size not exported");
+    require(std::get<std::string>(exported.at("appearance.candidate_window_layout")) == "horizontal",
+            "candidate window layout not exported");
     for (const auto &[key, value] : exported)
     {
         require(key.find("credential") == std::string::npos && key.find("endpoint") == std::string::npos &&
