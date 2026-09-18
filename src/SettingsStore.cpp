@@ -35,7 +35,9 @@ class ConfigWriteLock
         descriptor_ = open(lock_path.c_str(), O_RDWR | O_CREAT | O_CLOEXEC | O_NOFOLLOW, 0600);
         if (descriptor_ < 0)
             return;
-        struct stat status{};
+        struct stat status
+        {
+        };
         if (fstat(descriptor_, &status) != 0 || !S_ISREG(status.st_mode) || status.st_uid != geteuid())
             return;
         int result;

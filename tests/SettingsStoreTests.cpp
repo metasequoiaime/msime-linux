@@ -127,7 +127,9 @@ std::string read_file(const std::filesystem::path &path)
 
 ino_t inode(const std::filesystem::path &path)
 {
-    struct stat info{};
+    struct stat info
+    {
+    };
     if (stat(metasequoia::path_to_utf8(path).c_str(), &info) != 0)
     {
         throw std::runtime_error("Failed to inspect the settings file.");
