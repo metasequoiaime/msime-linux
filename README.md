@@ -1,5 +1,7 @@
 # 水杉输入法 Linux 版
 
+> **本仓库已归档，不再接受 issue 与 pull request。** Linux 前端已整合进 [metasequoiaime/msime](https://github.com/metasequoiaime/msime)，后续开发、发布与问题反馈都请到那里。本仓库保留为只读历史，已有的 Release 资产仍可下载，但不再更新。
+
 [官网](https://msime.app) · [用户文档](https://msime.app/docs/) · [隐私说明](PRIVACY.md) · [打包指南](docs/packaging.md) · [English README](README.en.md)
 
 <!-- badges:start -->

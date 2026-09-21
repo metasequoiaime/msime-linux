@@ -1,5 +1,7 @@
 # Metasequoia IME for Linux
 
+> **This repository is archived and no longer accepts issues or pull requests.** The Linux frontend has been merged into [metasequoiaime/msime](https://github.com/metasequoiaime/msime); development, releases and bug reports all continue there. This repository stays read-only for history — existing release assets remain downloadable but will not be updated.
+
 [中文 README](README.md) · [Website](https://msime.app) · [Docs](https://msime.app/docs/) · [Privacy](PRIVACY.md) · [Packaging](docs/packaging.md)
 
 <!-- badges:start -->
